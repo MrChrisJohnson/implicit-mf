@@ -67,7 +67,7 @@ class ImplicitMF():
             if user:
                 counts_i = self.counts[i].toarray()
             else:
-                counts_i = self.counts[:, i].toarray()
+                counts_i = self.counts[:, i].T.toarray()
             CuI = sparse.diags(counts_i, [0])
             pu = counts_i.copy()
             pu[np.where(pu != 0)] = 1.0
