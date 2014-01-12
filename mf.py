@@ -63,7 +63,7 @@ class ImplicitMF():
         num_fixed = fixed_vecs.shape[0]
         YTY = fixed_vecs.T.dot(fixed_vecs)
         eye = sparse.eye(num_fixed)
-        lambda_eye = self.reg_param
+        lambda_eye = self.reg_param * sparse.eye(self.num_factors)
         solve_vecs = np.zeros((num_solve, self.num_factors))
 
         t = time.time()
