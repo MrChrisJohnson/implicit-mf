@@ -28,17 +28,20 @@ def load_matrix(filename, num_users, num_items):
     counts *= alpha
     counts = sparse.csr_matrix(counts)
     t1 = time.time()
-    print 'Finished loading matrix in %f seconds' %(t1 - t0)
+    print 'Finished loading matrix in %f seconds' % (t1 - t0)
     return counts
+
 
 class ImplicitMF():
 
-    def __init__(self, counts, num_factors=40, num_iterations=30):
+    def __init__(self, counts, num_factors=40, num_iterations=30,
+                 reg_param=0.8):
         self.counts = counts
         self.num_users = counts.shape[0]
         self.num_items = counts.shape[1]
-        self.num_iterations = 10
         self.num_factors = num_factors
+        self.num_iterations = num_iterations
+        self.reg_param = reg_param
 
     def train_model(self):
         self.user_vectors = np.random.normal(size=(self.num_users,
@@ -60,6 +63,7 @@ class ImplicitMF():
         num_fixed = fixed_vecs.shape[0]
         YTY = fixed_vecs.T.dot(fixed_vecs)
         eye = sparse.eye(num_fixed)
+        lambda_eye = self.reg_param
         solve_vecs = np.zeros((num_solve, self.num_factors))
 
         t = time.time()
@@ -73,10 +77,10 @@ class ImplicitMF():
             pu[np.where(pu != 0)] = 1.0
             YTCuIY = fixed_vecs.T.dot(CuI).dot(fixed_vecs)
             YTCupu = fixed_vecs.T.dot(CuI + eye).dot(sparse.csr_matrix(pu).T)
-            xu = spsolve(YTY + YTCuIY, YTCupu)
+            xu = spsolve(YTY + YTCuIY + lambda_eye, YTCupu)
             solve_vecs[i] = xu
             if i % 1000 == 0:
-                print 'Solved %i vecs in %d seconds'  %(i, time.time() - t)
+                print 'Solved %i vecs in %d seconds' % (i, time.time() - t)
                 t = time.time()
 
         return solve_vecs
