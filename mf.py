@@ -5,7 +5,7 @@ import time
 
 def load_matrix(filename, num_users, num_items):
     t0 = time.time()
-    counts = np.zeros((num_users, num_items))
+    counts = sparse.dok_matrix((num_users, num_items), dtype=float)
     total = 0.0
     num_zeros = num_users * num_items
     for i, line in enumerate(open(filename, 'r')):
@@ -26,7 +26,7 @@ def load_matrix(filename, num_users, num_items):
     alpha = num_zeros / total
     print 'alpha %.2f' % alpha
     counts *= alpha
-    counts = sparse.csr_matrix(counts)
+    counts = counts.tocsr()
     t1 = time.time()
     print 'Finished loading matrix in %f seconds' % (t1 - t0)
     return counts
